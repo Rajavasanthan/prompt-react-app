@@ -16,7 +16,7 @@ function App() {
     setIsLoading(true);
     setHasSearched(true);
     try {
-      const response = await fetch(`http://localhost:3000/prompt/search-prompt?search=${encodeURIComponent(query)}`);
+      const response = await fetch(`https://prompt-node-app.onrender.com/prompt/search-prompt?search=${encodeURIComponent(query)}`);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');

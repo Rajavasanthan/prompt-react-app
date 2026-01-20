@@ -20,7 +20,7 @@ const AddPromptForm = ({ onSuccess, onCancel }) => {
         }),
         onSubmit: async (values, { setSubmitting, setStatus }) => {
             try {
-                const response = await fetch('http://localhost:3000/prompt/create-prompt', {
+                const response = await fetch('https://prompt-node-app.onrender.com/prompt/create-prompt', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -59,8 +59,8 @@ const AddPromptForm = ({ onSuccess, onCancel }) => {
                     onBlur={formik.handleBlur}
                     value={formik.values.title}
                     className={`p-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#7CA9A0]/50 transition-all ${formik.touched.title && formik.errors.title
-                            ? 'border-red-500 bg-red-50'
-                            : 'border-gray-200 focus:border-[#7CA9A0]'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 focus:border-[#7CA9A0]'
                         }`}
                     placeholder="e.g., Generate a logo..."
                 />
@@ -82,8 +82,8 @@ const AddPromptForm = ({ onSuccess, onCancel }) => {
                     onBlur={formik.handleBlur}
                     value={formik.values.prompt}
                     className={`p-3 border rounded-lg outline-none focus:ring-2 focus:ring-[#7CA9A0]/50 transition-all resize-none ${formik.touched.prompt && formik.errors.prompt
-                            ? 'border-red-500 bg-red-50'
-                            : 'border-gray-200 focus:border-[#7CA9A0]'
+                        ? 'border-red-500 bg-red-50'
+                        : 'border-gray-200 focus:border-[#7CA9A0]'
                         }`}
                     placeholder="Describe your prompt in detail..."
                 />
