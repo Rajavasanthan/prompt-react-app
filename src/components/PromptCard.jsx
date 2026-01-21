@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PromptCard = ({ title, prompt, onClick, likes, totalVotes }) => {
+const PromptCard = ({ title, prompt, onClick, likes, totalVotes, author }) => {
     return (
         <div
             onClick={onClick}
@@ -22,6 +22,9 @@ const PromptCard = ({ title, prompt, onClick, likes, totalVotes }) => {
                 </span>
                 <span className="flex items-center gap-1 hover:text-gray-600 transition-colors">
                     📋
+                </span>
+                <span className="flex items-center gap-1 hover:text-gray-600 transition-colors">
+                    {author}
                 </span>
             </div>
         </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import config from '../../config';
 
 const AddPromptForm = ({ onSuccess, onCancel }) => {
     const formik = useFormik({
@@ -20,10 +21,11 @@ const AddPromptForm = ({ onSuccess, onCancel }) => {
         }),
         onSubmit: async (values, { setSubmitting, setStatus }) => {
             try {
-                const response = await fetch('https://prompt-node-app.onrender.com/prompt/create-prompt', {
+                const response = await fetch(`${config.api}/prompt/create-prompt`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify(values),
                 });
