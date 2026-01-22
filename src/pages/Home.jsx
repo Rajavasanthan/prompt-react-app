@@ -147,7 +147,7 @@ function Home({ apiEndpoint = "/prompt/search-prompt" }) {
                         title={prompt.title}
                         prompt={prompt.prompt}
                         likes={prompt.likes}
-                        author={prompt.author_id?.name}
+                        author={prompt.author?.name}
                         totalVotes={prompt.totalVotes}
                         onClick={() => setSelectedPrompt(prompt)}
                     />
