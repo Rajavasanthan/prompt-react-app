@@ -46,6 +46,12 @@ function Home({ apiEndpoint = "/prompt/search-prompt" }) {
         fetchPrompts('');
     }, [apiEndpoint]);
 
+    // Clear search query when the logo is clicked
+    const handleLogoClick = () => {
+        setSearchQuery('');
+        fetchPrompts('');
+    };
+
     const handleSearch = () => {
         fetchPrompts(searchQuery);
     };
@@ -79,7 +85,7 @@ function Home({ apiEndpoint = "/prompt/search-prompt" }) {
 
                 {/* Logo Area */}
                 <div className="text-center flex-1">
-                    <Link to="/">
+                    <Link to="/" onClick={handleLogoClick}>
                         <h1 className="text-4xl md:text-5xl font-black text-[#FF9D9D] mb-2 tracking-wide">PROMPTIFY</h1>
                     </Link>
                     <p className="text-gray-500 font-serif italic text-lg">your prompt search ends here...</p>
