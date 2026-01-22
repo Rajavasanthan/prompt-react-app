@@ -100,7 +100,7 @@ function Home({ apiEndpoint = "/prompt/search-prompt" }) {
                         + Add your prompt
                     </button>
                     {/* Add Prompt Button */}
-                    <Link to="/my-prompts"
+                    <Link to="/my-prompts" onClick={handleLogoClick}
                         className="bg-[#7CA9A0] hover:bg-[#6b968d] text-white px-6 py-2 rounded shadow-sm transition-colors cursor-pointer font-medium"
                     >
                         + My Prompts
