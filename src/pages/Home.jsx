@@ -4,8 +4,9 @@ import Modal from '../components/Modal';
 import AddPromptForm from '../components/AddPromptForm';
 import config from '../../config';
 import { useAuth } from '../context/AuthContext'; // Added for Logout button
+import { Link } from 'react-router';
 
-function Home() {
+function Home({ apiEndpoint = "/prompt/search-prompt" }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [prompts, setPrompts] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -13,13 +14,13 @@ function Home() {
     const [selectedPrompt, setSelectedPrompt] = useState(null);
     const [hasSearched, setHasSearched] = useState(false);
 
-    const { logout } = useAuth(); // Destructure logout
+    const { logout, user } = useAuth(); // Destructure logout
 
     const fetchPrompts = async (query) => {
         setIsLoading(true);
         setHasSearched(true);
         try {
-            const response = await fetch(`${config.api}/prompt/search-prompt?search=${encodeURIComponent(query)}`,
+            const response = await fetch(`${config.api}${apiEndpoint}?search=${encodeURIComponent(query)}`,
                 {
                     headers: {
                         'Authorization': `${localStorage.getItem('token')}`
@@ -43,7 +44,7 @@ function Home() {
 
     useEffect(() => {
         fetchPrompts('');
-    }, []);
+    }, [apiEndpoint]);
 
     const handleSearch = () => {
         fetchPrompts(searchQuery);
@@ -62,13 +63,15 @@ function Home() {
 
     return (
         <div className="min-h-screen p-6 md:p-12 max-w-7xl mx-auto font-sans relative">
-            {/* Logout Button - Absolute top right or nicely integrated */}
-            <button
-                onClick={logout}
-                className="absolute top-6 right-6 md:top-12 md:right-12 text-sm text-gray-400 hover:text-[#FF9D9D] transition-colors"
-            >
-                Logout
-            </button>
+            <div className="absolute top-6 right-6 md:top-12 md:right-12 flex items-center gap-4">
+                {user?.name && <span className="text-sm font-medium text-gray-600">Hi, {user.name}</span>}
+                <button
+                    onClick={logout}
+                    className="text-sm text-gray-400 hover:text-[#FF9D9D] transition-colors"
+                >
+                    Logout
+                </button>
+            </div>
 
             {/* Header */}
             <header className="flex justify-between items-center mb-16 md:mb-24 mt-8 md:mt-0">
@@ -76,18 +79,26 @@ function Home() {
 
                 {/* Logo Area */}
                 <div className="text-center flex-1">
-                    <h1 className="text-4xl md:text-5xl font-black text-[#FF9D9D] mb-2 tracking-wide">PROMPTIFY</h1>
+                    <Link to="/">
+                        <h1 className="text-4xl md:text-5xl font-black text-[#FF9D9D] mb-2 tracking-wide">PROMPTIFY</h1>
+                    </Link>
                     <p className="text-gray-500 font-serif italic text-lg">your prompt search ends here...</p>
                 </div>
 
-                <div className="flex-1 flex justify-end items-center gap-4">
-                    {/* Add Prompt Button */}
+
+                <div className="flex-1 flex justify-end items-center gap-1">
                     <button
                         onClick={() => setIsAddModalOpen(true)}
                         className="bg-[#7CA9A0] hover:bg-[#6b968d] text-white px-6 py-2 rounded shadow-sm transition-colors cursor-pointer font-medium"
                     >
                         + Add your prompt
                     </button>
+                    {/* Add Prompt Button */}
+                    <Link to="/my-prompts"
+                        className="bg-[#7CA9A0] hover:bg-[#6b968d] text-white px-6 py-2 rounded shadow-sm transition-colors cursor-pointer font-medium"
+                    >
+                        + My Prompts
+                    </Link>
                     {/* Profile Placeholder */}
                     <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
                 </div>

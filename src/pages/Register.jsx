@@ -1,34 +1,35 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Added Link
 import { useState } from 'react';
 
-const LoginSchema = Yup.object().shape({
+const RegisterSchema = Yup.object().shape({
+    name: Yup.string().required('Required'),
     email: Yup.string().email('Invalid email').required('Required'),
     password: Yup.string().required('Required'),
 });
 
-const Login = () => {
-    const { login } = useAuth();
+const Register = () => {
+    const { register } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
-    const from = location.state?.from?.pathname || '/';
     const [error, setError] = useState(null);
 
     const formik = useFormik({
         initialValues: {
+            name: '',
             email: '',
             password: '',
         },
-        validationSchema: LoginSchema,
+        validationSchema: RegisterSchema,
         onSubmit: async (values) => {
             setError(null);
-            const result = await login(values.email, values.password);
+            const result = await register(values.name, values.email, values.password);
             if (result.success) {
-                navigate(from, { replace: true });
+                // Redirect to login after successful registration
+                navigate('/login');
             } else {
-                setError(result.message || 'Login failed');
+                setError(result.message || 'Registration failed');
             }
         },
     });
@@ -40,11 +41,31 @@ const Login = () => {
                 {/* Header */}
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-black text-[#FF9D9D] mb-2 tracking-wide">PROMPTIFY</h1>
-                    <p className="text-gray-500 font-serif italic">Welcome back!</p>
+                    <p className="text-gray-500 font-serif italic">Create your account</p>
                 </div>
 
                 {/* Form */}
                 <form onSubmit={formik.handleSubmit} className="space-y-6">
+
+                    {/* Name */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
+                            Name
+                        </label>
+                        <input
+                            id="name"
+                            name="name"
+                            type="text"
+                            onChange={formik.handleChange}
+                            value={formik.values.name}
+                            className={`w-full bg-[#CDE8E3]/30 text-gray-700 px-4 py-3 rounded-lg outline-none focus:ring-2 focus:ring-[#7CA9A0]/50 transition-all ${formik.errors.name && formik.touched.name ? 'border-red-500 ring-1 ring-red-500' : ''
+                                }`}
+                            placeholder="Your Name"
+                        />
+                        {formik.errors.name && formik.touched.name && (
+                            <p className="text-red-500 text-xs mt-1 ml-1">{formik.errors.name}</p>
+                        )}
+                    </div>
 
                     {/* Email */}
                     <div>
@@ -99,16 +120,16 @@ const Login = () => {
                         disabled={formik.isSubmitting}
                         className="w-full bg-[#7CA9A0] hover:bg-[#6b968d] text-white font-bold py-4 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                        {formik.isSubmitting ? 'Signing in...' : 'Sign In'}
+                        {formik.isSubmitting ? 'Creating account...' : 'Register'}
                     </button>
                 </form>
 
                 <div className="mt-8 text-center text-sm text-gray-400">
-                    <p>Don't have an account? <Link to="/register" className="text-[#FF9D9D] cursor-pointer hover:underline">Register here</Link></p>
+                    <p>Already have an account? <Link to="/login" className="text-[#FF9D9D] cursor-pointer hover:underline">Login here</Link></p>
                 </div>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default Register;

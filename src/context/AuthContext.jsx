@@ -4,8 +4,8 @@ import config from '../../config';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token'));
+    const [user, setUser] = useState(token ? { token, name: localStorage.getItem('userName') } : null);
     const [isLoading, setIsLoading] = useState(false); // Used for initial token check if needed, or login loading
 
     useEffect(() => {
@@ -14,9 +14,37 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             // You might want to decode token to get user info if it's a JWT
             // or fetch user profile
-            setUser({ token });
+            setUser((prev) => ({ ...prev, token, name: localStorage.getItem('userName') }));
+        } else {
+            setUser(null);
         }
     }, [token]);
+
+    const register = async (name, email, password) => {
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${config.api}/users/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed');
+            }
+
+            return { success: true, message: 'Registration successful! Please login.' };
+        } catch (error) {
+            console.error("Registration error:", error);
+            return { success: false, message: error.message };
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const login = async (email, password) => {
         setIsLoading(true);
@@ -31,7 +59,7 @@ export const AuthProvider = ({ children }) => {
             });
 
             const data = await response.json();
-
+            console.log(data);
             if (!response.ok) {
                 throw new Error(data.message || 'Login failed');
             }
@@ -46,7 +74,8 @@ export const AuthProvider = ({ children }) => {
 
             setToken(receivedToken);
             localStorage.setItem('token', receivedToken);
-            setUser({ token: receivedToken });
+            localStorage.setItem('userName', data.name);
+            setUser({ token: receivedToken, name: data.name });
 
             return { success: true };
         } catch (error) {
@@ -61,10 +90,11 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         setUser(null);
         localStorage.removeItem('token');
+        localStorage.removeItem('userName');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+        <AuthContext.Provider value={{ user, login, logout, register, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
