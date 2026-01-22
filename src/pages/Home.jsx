@@ -62,6 +62,41 @@ function Home({ apiEndpoint = "/prompt/search-prompt" }) {
         }
     };
 
+    const handleVote = async (promptId, type) => {
+        // Optimistic UI Update
+        setPrompts(prevPrompts => prevPrompts.map(p => {
+            if ((p.id || p._id) === promptId) {
+                if (type === 'like') {
+                    return { ...p, likes: (p.likes || 0) + 1, totalVotes: (p.totalVotes || 0) + 1 };
+                } else {
+                    return { ...p, totalVotes: (p.totalVotes || 0) + 1 };
+                }
+            }
+            return p;
+        }));
+
+        try {
+            const response = await fetch(`${config.api}/prompt/vote-prompt/${promptId}?action=${type}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `${localStorage.getItem('token')}`,
+                    'Content-Type': 'application/json'
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Vote failed');
+            }
+
+            // Optionally refresh specific prompt data here if needed, 
+            // but optimistic update should be sufficient for smooth UX
+        } catch (error) {
+            console.error("Vote failed:", error);
+            // Revert optimistic update on error (simplified for now, ideally track per-item pending state)
+            fetchPrompts(searchQuery);
+        }
+    };
+
     const handleAddSuccess = () => {
         setIsAddModalOpen(false);
         fetchPrompts('');
@@ -143,13 +178,16 @@ function Home({ apiEndpoint = "/prompt/search-prompt" }) {
             <main className="grid grid-cols-1 gap-4 max-w-4xl mx-auto">
                 {prompts.map(prompt => (
                     <PromptCard
-                        key={prompt.id || Math.random()}
+                        key={prompt.id || prompt._id || Math.random()}
                         title={prompt.title}
                         prompt={prompt.prompt}
                         likes={prompt.likes}
                         author={prompt.author?.name}
                         totalVotes={prompt.totalVotes}
+
                         onClick={() => setSelectedPrompt(prompt)}
+                        onLike={() => handleVote(prompt.id || prompt._id, 'like')}
+                        onDislike={() => handleVote(prompt.id || prompt._id, 'dislike')}
                     />
                 ))}
                 {hasSearched && !isLoading && prompts.length === 0 && (
